@@ -23,10 +23,31 @@ customer-segmentation-telecom/
 ```
 
 ## Setup Instructions
-1. Create a virtual environment: `python -m venv venv`
-2. Activate the environment: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows)
-3. Install dependencies: `pip install -r requirements.txt`
-4. Launch Jupyter: `jupyter notebook`
+
+### Option 1: Docker Deployment (Recommended for Production)
+```bash
+# Development deployment
+./deploy.sh dev
+
+# Production deployment with Nginx
+./deploy.sh prod
+
+# Deployment with Redis caching
+./deploy.sh cache
+```
+
+### Option 2: Local Development
+```bash
+# Automated setup
+python setup.py
+
+# Manual setup
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+jupyter notebook
+```
 
 ## Dataset
 We'll be using a publicly available telecommunications customer dataset that includes:
@@ -43,3 +64,65 @@ We'll be using a publicly available telecommunications customer dataset that inc
 4. **Segmentation**: Apply clustering algorithms to identify customer segments
 5. **Validation**: Evaluate segmentation quality and business relevance
 6. **Insights**: Generate actionable business recommendations
+
+## 🚀 Production API Deployment
+
+This project includes a production-ready REST API built with FastAPI and containerized with Docker.
+
+### Quick Start
+```bash
+# Deploy API in development mode
+./deploy.sh dev
+
+# Access API documentation
+open http://localhost:8080/docs
+```
+
+### API Endpoints
+- `GET /health` - Health check
+- `POST /segment` - Segment a single customer
+- `POST /predict` - Predict high-value customer
+- `POST /segment-batch` - Batch customer segmentation
+- `GET /segments/summary` - Get segment statistics
+- `GET /model/info` - Model information
+
+### API Usage Example
+```python
+import requests
+
+# Customer data
+customer = {
+    "gender": "Male",
+    "SeniorCitizen": 0,
+    "tenure": 24,
+    "MonthlyCharges": 79.85,
+    "Contract": "Two year",
+    # ... other fields
+}
+
+# Get customer segment
+response = requests.post(
+    "http://localhost:8080/segment",
+    json=customer
+)
+result = response.json()
+print(f"Customer segment: {result['segment_name']}")
+```
+
+### Deployment Options
+
+| Command | Description | Use Case |
+|---------|-------------|----------|
+| `./deploy.sh dev` | Basic API service | Development and testing |
+| `./deploy.sh prod` | API + Nginx reverse proxy | Production deployment |
+| `./deploy.sh cache` | API + Redis caching | High-performance production |
+| `./deploy.sh stop` | Stop all services | Maintenance |
+| `./deploy.sh clean` | Clean containers & volumes | Reset deployment |
+
+### Container Features
+- 🐳 **Dockerized**: Consistent deployment across environments
+- 🔄 **Health Checks**: Built-in container health monitoring
+- 🔒 **Security**: Non-root user, minimal attack surface
+- 📊 **Monitoring**: Structured logging and metrics
+- ⚡ **Performance**: Optimized for production workloads
+- 🔧 **Scalable**: Ready for horizontal scaling with load balancer
